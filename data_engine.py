@@ -1,11 +1,9 @@
 #this file will contain code for a simple demonstration of FLUID technique of stock market data collection
-
-
 import pandas as pd
 import numpy as np
 import yfinance as yf
 import streamlit as st
-
+import requests
 
 # Fetching data using yf
 #by default 6mo period
@@ -17,8 +15,11 @@ def fetch_market_data(tickers, period="6mo"):
     for ticker in tickers:
         print(ticker)
 
+        session = requests.Session()
+        session.headers.update({'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'})
+    
         #Initialising the ticker object
-        stock = yf.Ticker(ticker)
+        stock = yf.Ticker(ticker, session=session)
 
         #fetchig historical data
         df = stock.history(period=period)
