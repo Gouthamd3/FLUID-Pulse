@@ -1,10 +1,14 @@
 import os
 from google import genai
+from dotenv import load_dotenv  # 1. Import the dotenv loader
 
-#Using Gemini api
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY", "AQ.Ab8RN6IPuPCgyUyZ04zwVW3njPmpys7iX94TI_-5St8MGea7fA"))
+# 2. Load the variables from your local .env file
+load_dotenv()
 
-
+# 3. Initialize the Gemini Client securely
+# This will look for GEMINI_API_KEY inside your .env file automatically.
+# The hardcoded key fallback is completely removed so it never leaks on GitHub.
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 def generate_market_update(ticker, close, sma_50, rsi):
     #use stock's metrics and generate expert analysis using this together ai
 
