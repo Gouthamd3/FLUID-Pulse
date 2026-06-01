@@ -1,14 +1,23 @@
 import os
+import streamlit as st
 from google import genai
-from dotenv import load_dotenv  # 1. Import the dotenv loader
+from dotenv import load_dotenv
 
-# 2. Load the variables from your local .env file
+# 1. Load local .env variables if running locally
 load_dotenv()
 
-# 3. Initialize the Gemini Client securely
-# This will look for GEMINI_API_KEY inside your .env file automatically.
-# The hardcoded key fallback is completely removed so it never leaks on GitHub.
-client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+# 2. Extract the key safely using a dual-layer check
+# Streamlit secrets takes priority when running live on the web
+if "GEMINI_API_KEY" in st.secrets:
+    api_key = st.secrets["GEMINI_API_KEY"]
+else:
+    api_key = os.environ.get("GEMINI_API_KEY")
+
+# 3. Initialize the client securely
+# If both checks fail, client will throw a clear missing-key error instead of an OAuth error
+client = genai.Client(api_key=api_key)
+
+
 def generate_market_update(ticker, close, sma_50, rsi):
     #use stock's metrics and generate expert analysis using this together ai
 
