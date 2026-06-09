@@ -46,8 +46,6 @@ def fetch_market_data(tickers, period="6mo", max_retries=3):
                 break
         
         if df is not None and not df.empty:
-
-        if not df.empty:
             df = df.reset_index()
             df = df[['Date', 'Open', 'High', 'Low','Close', 'Volume']]
             df['Ticker'] = ticker #Which stock this data belongs to
