@@ -6,16 +6,29 @@ from dotenv import load_dotenv
 # 1. Load local .env variables if running locally
 load_dotenv()
 
-# 2. Extract the key safely using a dual-layer check
-# Streamlit secrets takes priority when running live on the web
-if "GEMINI_API_KEY" in st.secrets:
-    api_key = st.secrets["GEMINI_API_KEY"]
-else:
-    api_key = os.environ.get("GEMINI_API_KEY")
 
-# 3. Initialize the client securely
-# If both checks fail, client will throw a clear missing-key error instead of an OAuth error
-client = genai.Client(api_key=api_key)
+def get_gemini_api_key():
+    """Return GEMINI_API_KEY from Streamlit secrets or environment variables."""
+    api_key = None
+
+    try:
+        api_key = st.secrets.get("GEMINI_API_KEY")
+    except Exception:
+        api_key = None
+
+    if not api_key:
+        api_key = os.environ.get("GEMINI_API_KEY")
+
+    if not api_key:
+        raise RuntimeError(
+            "Missing GEMINI_API_KEY. Set it in Streamlit secrets or as an environment variable."
+        )
+
+    return api_key
+
+
+def get_genai_client():
+    return genai.Client(api_key=get_gemini_api_key())
 
 
 def generate_market_update(ticker, close, sma_50, rsi):
@@ -36,12 +49,12 @@ def generate_market_update(ticker, close, sma_50, rsi):
     """
 
     try:
-        # Calling the Gemini API
-       response = client.models.generate_content(
-            model='gemini-2.5-flash',
+        client = get_genai_client()
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
             contents=prompt,
         )
-       return response.text.strip()
+        return response.text.strip()
     
     except Exception as e:
         return f"Error generating content for {ticker}: {str(e)}"
