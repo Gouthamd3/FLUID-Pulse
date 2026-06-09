@@ -25,31 +25,31 @@ if st.button("Run F.L.U.I.D. Engine", type="primary"):
                 'ITC.NS', 'SBIN.NS', 'TVSMOTOR.NS', 'DIXON.NS', 'HAL.NS', 'BHEL.NS'
             ]
             raw_market_data = fetch_market_data(nse_tickers, period="6mo")
-    
-    with st.spinner("Applying Momentum & Trend Logic..."):
-        flagged_opportunities = apply_fluid_filter(raw_market_data)
-
-    if not flagged_opportunities.empty:
-        st.success(f"Discovered {len(flagged_opportunities)} momentum breakouts fitting the criteria.")
-
-        #Displaying the math
-        st.subheader("Quantitative Breakdown")
-        st.dataframe(flagged_opportunities[['Ticker', 'Close', 'SMA_50', 'RSI_14']], hide_index=True)
-
-        st.divider()
-        st.subheader("AI-Generated Research Reports")
         
-        # Generate and display the content
-        for index, row in flagged_opportunities.iterrows():
-            with st.spinner(f"Drafting report for {row['Ticker']}..."):
-                report = generate_market_update(row['Ticker'], row['Close'], row['SMA_50'], row['RSI_14'])
-                
-                with st.expander(f"Market Update: {row['Ticker']}", expanded=True):
-                    st.write(report)
+        with st.spinner("Applying Momentum & Trend Logic..."):
+            flagged_opportunities = apply_fluid_filter(raw_market_data)
+
+        if not flagged_opportunities.empty:
+            st.success(f"Discovered {len(flagged_opportunities)} momentum breakouts fitting the criteria.")
+
+            #Displaying the math
+            st.subheader("Quantitative Breakdown")
+            st.dataframe(flagged_opportunities[['Ticker', 'Close', 'SMA_50', 'RSI_14']], hide_index=True)
+
+            st.divider()
+            st.subheader("AI-Generated Research Reports")
             
-            time.sleep(3)
-    else:
-        st.info("No stocks passed the strict F.L.U.I.D. momentum criteria today.")
+            # Generate and display the content
+            for index, row in flagged_opportunities.iterrows():
+                with st.spinner(f"Drafting report for {row['Ticker']}..."):
+                    report = generate_market_update(row['Ticker'], row['Close'], row['SMA_50'], row['RSI_14'])
+                    
+                    with st.expander(f"Market Update: {row['Ticker']}", expanded=True):
+                        st.write(report)
+                
+                time.sleep(3)
+        else:
+            st.info("No stocks passed the strict F.L.U.I.D. momentum criteria today.")
     
     except Exception as e:
         st.error(f"⚠️ Rate Limit Error: Yahoo Finance API is rate-limited.")
